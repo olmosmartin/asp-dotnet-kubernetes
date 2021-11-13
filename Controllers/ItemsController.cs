@@ -31,6 +31,56 @@ namespace Catalog.Controllers{
             }
         }
 
+        // POST api/items
+        [HttpPost]
+        public ActionResult<ItemDTO> PostItem(AddItemDto itemDTO){
+            Item item = new(){
+                Id = Guid.NewGuid(),
+                Name = itemDTO.Name,
+                Description = itemDTO.Description,
+                Price = itemDTO.Price,
+            };
+            repository.AddItem(item);
+            return CreatedAtAction(nameof(GetItem), new { id = item.Id }, item.asDto());
+        }
+
+        // PUT api/items/{id}
+        [HttpPut("{id}")]
+        public ActionResult PutItem(Guid id, UpdateItemDto itemDTO)
+        {
+            var existingItem = repository.GetItem(id);
+            if (existingItem is null)
+            {
+                return NotFound();
+            }
+            /*  otra forma usando with que toma el que existe y le cambia los valores
+                Item udatedItem = existingItem.with{
+                    Name = itemDTO.Name,
+                    Description = itemDTO.Description,
+                    Price = itemDTO.Price,
+                };
+            */
+            Item udatedItem = new(){
+                Id = id,
+                Name = itemDTO.Name,
+                Description = itemDTO.Description,
+                Price = itemDTO.Price,
+            };
+            repository.UpdateItem(udatedItem);
+            return NoContent();
+        }
+
+        // DELETE api/items/{id}
+        [HttpDelete("{id}")]
+        public ActionResult DeleteItem(Guid id){
+            var existingItem = repository.GetItem(id);
+            if (existingItem is null)
+            {
+                return NotFound();
+            }
+            repository.DeleteItem(id);
+            return NoContent();
+        }
     }
         
 }

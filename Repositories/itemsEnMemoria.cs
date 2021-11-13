@@ -38,5 +38,12 @@ namespace Catalog.Repositories {
         public IEnumerable<Item> GetItems() => items;
 
         public Item GetItem(Guid id) => items.Find(x => x.Id == id);
+        public void AddItem(Item item) => items.Add(item);
+        public void UpdateItem(Item item)
+        {
+            var itemIndex = items.FindIndex(itm => itm.Id == item.Id);
+            items[itemIndex] = item;
+        }
+        public void DeleteItem(Guid id) => items.RemoveAll(x => x.Id == id);
     }
 }
