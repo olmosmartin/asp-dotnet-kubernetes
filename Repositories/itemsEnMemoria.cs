@@ -35,15 +35,22 @@ namespace Catalog.Repositories {
             },
         };
 
-        public IEnumerable<Item> GetItems() => items;
+        public async Task<IEnumerable<Item>> GetItemsAsync() => await Task.FromResult(items);
 
-        public Item GetItem(Guid id) => items.Find(x => x.Id == id);
-        public void AddItem(Item item) => items.Add(item);
-        public void UpdateItem(Item item)
+        public async Task<Item> GetItemAsync(Guid id) => await Task.FromResult(items.SingleOrDefault(x => x.Id == id));
+        public async Task AddItemAsync(Item item) {
+            items.Add(item);
+            await Task.CompletedTask;
+        } 
+        public async Task UpdateItemAsync(Item item)
         {
             var itemIndex = items.FindIndex(itm => itm.Id == item.Id);
             items[itemIndex] = item;
+            await Task.CompletedTask;
         }
-        public void DeleteItem(Guid id) => items.RemoveAll(x => x.Id == id);
+        public async Task DeleteItemAsync(Guid id){
+            items.RemoveAll(x => x.Id == id);
+            await Task.CompletedTask;
+        }
     }
 }

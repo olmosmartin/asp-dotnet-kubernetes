@@ -15,15 +15,16 @@ namespace Catalog.Controllers{
 
         // GET api/items
         [HttpGet]
-        public IEnumerable<ItemDTO> GetItems(){
-            var items = repository.GetItems().Select (item => item.asDto());
+        public async Task<IEnumerable<ItemDTO>> GetItemsAsync(){
+            var items = (await repository.GetItemsAsync())
+                        .Select (item => item.asDto());
             return items;
         }
 
         // GET api/items/{id}
         [HttpGet("{id}")]
-        public ActionResult<ItemDTO> GetItem(Guid id){
-            var item = repository.GetItem(id);
+        public async Task<ActionResult<ItemDTO>> GetItemAsync(Guid id){
+            var item = await repository.GetItemAsync(id);
             if(item is null){
                 return NotFound();
             } else {
@@ -33,22 +34,23 @@ namespace Catalog.Controllers{
 
         // POST api/items
         [HttpPost]
-        public ActionResult<ItemDTO> PostItem(AddItemDto itemDTO){
+        public async Task<ActionResult<ItemDTO>> PostItemAsync(AddItemDto itemDTO){
             Item item = new(){
                 Id = Guid.NewGuid(),
                 Name = itemDTO.Name,
                 Description = itemDTO.Description,
                 Price = itemDTO.Price,
             };
-            repository.AddItem(item);
-            return CreatedAtAction(nameof(GetItem), new { id = item.Id }, item.asDto());
+            await repository.AddItemAsync(item);
+            //en program se agrego option.SuppressAsyncSuffixInActionNames porque no se puede usar async en el nombre de la accion y despues llamarla
+            return CreatedAtAction(nameof(GetItemAsync), new { id = item.Id }, item.asDto());
         }
 
         // PUT api/items/{id}
         [HttpPut("{id}")]
-        public ActionResult PutItem(Guid id, UpdateItemDto itemDTO)
+        public async Task<ActionResult> PutItemAsync(Guid id, UpdateItemDto itemDTO)
         {
-            var existingItem = repository.GetItem(id);
+            var existingItem = await repository.GetItemAsync(id);
             if (existingItem is null)
             {
                 return NotFound();
@@ -66,19 +68,19 @@ namespace Catalog.Controllers{
                 Description = itemDTO.Description,
                 Price = itemDTO.Price,
             };
-            repository.UpdateItem(udatedItem);
+            await repository.UpdateItemAsync(udatedItem);
             return NoContent();
         }
 
         // DELETE api/items/{id}
         [HttpDelete("{id}")]
-        public ActionResult DeleteItem(Guid id){
-            var existingItem = repository.GetItem(id);
+        public async Task<ActionResult> DeleteItemAsync(Guid id){
+            var existingItem = await repository.GetItemAsync(id);
             if (existingItem is null)
             {
                 return NotFound();
             }
-            repository.DeleteItem(id);
+            await repository.DeleteItemAsync(id);
             return NoContent();
         }
     }
